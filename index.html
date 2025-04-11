@@ -1,0 +1,106 @@
+---
+layout: null
+---
+<!DOCTYPE html>
+<html
+    lang="en"
+    class="h-full bg-gray-50"
+>
+
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <title>Utility Tools</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="h-full">
+    <div class="min-h-full">
+        <header class="bg-white shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-2xl font-bold text-gray-900">
+                        Utility Tools
+                    </h1>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {% comment %} Get root directories only {% endcomment %}
+            {% assign directories = "" | split: "," %}
+            {% for file in site.static_files %}
+            {% assign path_parts = file.path | split: "/" %}
+            {% if path_parts.size > 2 %}
+            {% assign dir = "/" | append: path_parts[1] %}
+            {% unless directories contains dir %}
+            {% assign directories = directories | push: dir %}
+            {% endunless %}
+            {% endif %}
+            {% endfor %}
+
+            {% comment %} Display directories and their HTML files {% endcomment %}
+            {% assign sorted_directories = directories | sort %}
+            {% for dir in sorted_directories %}
+            {% assign has_html = false %}
+            {% for file in site.static_files %}
+            {% if file.path contains dir and file.extname == '.html' %}
+            {% assign has_html = true %}
+            {% break %}
+            {% endif %}
+            {% endfor %}
+
+            {% if has_html %}
+            <div class="mb-8">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">
+                    {{ dir | remove_first: "/" }}
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {% for file in site.static_files %}
+                    {% if file.path contains dir and file.extname == '.html' %}
+                    <div class="group p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200">
+                        <a
+                            href="{{ file.path }}"
+                            class="block"
+                        >
+                            <div class="flex items-center space-x-3">
+                                <div class="flex-shrink-0">
+                                    <svg
+                                        class="h-6 w-6 text-gray-400"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                                        />
+                                    </svg>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium text-gray-900 truncate group-hover:text-blue-600 ">
+                                        {{ file.path | split: "/" | last }}
+                                    </p>
+                                    <p class="text-xs text-gray-500">
+                                        {{ file.extname | remove_first: "." | upcase | default: "File" }}
+                                    </p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </main>
+    </div>
+</body>
+
+</html>
